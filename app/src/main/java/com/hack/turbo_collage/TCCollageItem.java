@@ -1,11 +1,12 @@
 package com.hack.turbo_collage;
 
-public class TCCollageItem extends TCCollageItemBase {
+public class TCCollageItem{
 
     TCRect ratioRect;
+    String uuid;
 
     public TCCollageItem(String uuid, TCRect ratioRect) {
-        super(uuid);
+        this.uuid = uuid;
         this.ratioRect = ratioRect;
     }
 
@@ -18,6 +19,10 @@ public class TCCollageItem extends TCCollageItemBase {
             max = h;
         }
         return max;
+    }
+
+    public boolean emptyUUID() {
+        return uuid == null || uuid.trim().length() <= 0;
     }
 
     @Override

@@ -11,22 +11,18 @@ import java.util.Set;
 public class TCShuffle {
 
     TCShuffle s1;
-
     TCShuffle s2;
-
-    TCShuffle noUse;
+    TCShuffle s3;
 
     String uuid;
-
     double ratio;
-
     TCJoin tcJoin;
 
 
     private double a(double d, double d2) {
-        List<TCCollageItemBase> arrayList = new ArrayList<>(b());
+        List<TCCollageItem> arrayList = new ArrayList<>(b());
         a(arrayList, new TCRect(0.0d, 0.0d, 1.0d, 1.0d));
-        Iterator<TCCollageItemBase> it = arrayList.iterator();
+        Iterator<TCCollageItem> it = arrayList.iterator();
         double r0 = 4726483295817170944.0;
         while (true) {
             double c = r0;
@@ -40,7 +36,6 @@ public class TCShuffle {
     }
 
     // 把所有shuffleList链接起来
-    /* renamed from: a */
     private static TCShuffle linkAllShuffles(List<TCShuffle> shuffleList, TCShuffle noUse) {
         TCShuffle result;
         if (shuffleList.size() == 1) {
@@ -54,11 +49,11 @@ public class TCShuffle {
             s.s2 = shuffle2;
             result = s;
         }
-        result.noUse = noUse;
+        result.s3 = noUse;
         return result;
     }
 
-    /* renamed from: a */
+
     private static TCShuffle getTotalShuffle(Map<String, Double> ratioMap) {
         TCShuffle shuffle;
         if (ratioMap.size() <= 0) {
@@ -127,7 +122,6 @@ public class TCShuffle {
         return shuffle;
     }
 
-    /* renamed from: a */
     private void setRatio(double setRatio) {
         this.ratio = setRatio;
     }
@@ -135,7 +129,6 @@ public class TCShuffle {
     private int b() {
         return this.uuid != null ? 1 : this.s1.b() + this.s2.b();
     }
-
 
     private void b(double paramDouble) {
         if (this.uuid == null) {
@@ -185,7 +178,6 @@ public class TCShuffle {
         return list;
     }
 
-    /* renamed from: d */
     private void changeJoinType() {
         if (this.tcJoin == TCJoin.TCLeftRightJoin) {
             this.tcJoin = TCJoin.TCUpDownJoin;
@@ -206,7 +198,7 @@ public class TCShuffle {
         return r10;
     }
 
-    public void a(List<TCCollageItemBase> list, TCRect iVar) {
+    public void a(List<TCCollageItem> list, TCRect iVar) {
         TCRect iVar2;
         TCRect iVar3;
         if (list != null) {

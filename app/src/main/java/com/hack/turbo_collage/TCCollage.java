@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class TCCollage {
 
-    private final List<TCCollageItemBase> collageItems = new ArrayList<>();
+    private final List<TCCollageItem> collageItems = new ArrayList<>();
 
     private double width = 1000;
     private double height = 1500;
@@ -19,8 +19,8 @@ public class TCCollage {
     private final Map<String, TCBitmap> bitmapMap = new HashMap<>();
 
 
-    //初始化，设置TCBitmaps数据，之后调用collage()即可
-    //每次图片尺寸变化最好init以下
+    //初始化，设置TCBitmaps数据，传入的每张图片的尺寸，之后调用collage()
+    //图片尺寸变化时，重新调用一下这个方法即可
     public void init(List<TCBitmap> bitmaps) {
 
         bitmapMap.clear();
@@ -31,7 +31,7 @@ public class TCCollage {
         if (bitmaps != null && bitmaps.size() > 0) {
             for (TCBitmap bitmap : bitmaps) {
                 String uuid = bitmap.getUUID();
-                TCCollageItemBase emptyCollageItem = getEmptyItemOrNull();
+                TCCollageItem emptyCollageItem = getEmptyItemOrNull();
                 if (emptyCollageItem != null) {
                     emptyCollageItem.uuid = uuid;
                 } else {
@@ -100,18 +100,17 @@ public class TCCollage {
     }
 
 
-
-    private TCCollageItemBase getEmptyItemOrNull() {
-        List<TCCollageItemBase> list = getEmptyUUIDCollageItems();
+    private TCCollageItem getEmptyItemOrNull() {
+        List<TCCollageItem> list = getEmptyUUIDCollageItems();
         return list.size() > 0 ? list.get(0) : null;
     }
 
 
-    private List<TCCollageItemBase> getEmptyUUIDCollageItems() {
-        List<TCCollageItemBase> list = new ArrayList<>();
-        for (TCCollageItemBase collageItemBase : this.collageItems) {
-            if (collageItemBase.emptyUUID()) {
-                list.add(collageItemBase);
+    private List<TCCollageItem> getEmptyUUIDCollageItems() {
+        List<TCCollageItem> list = new ArrayList<>();
+        for (TCCollageItem collageItem : this.collageItems) {
+            if (collageItem.emptyUUID()) {
+                list.add(collageItem);
             }
         }
         return list;

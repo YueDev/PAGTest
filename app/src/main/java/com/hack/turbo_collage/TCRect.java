@@ -1,8 +1,6 @@
 package com.hack.turbo_collage;
 
 
-import androidx.annotation.NonNull;
-
 public class TCRect {
 
     public double left;

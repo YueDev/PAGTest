@@ -10,8 +10,8 @@ import com.example.pagtest.databinding.ItemPagBinding
 
 class PagAdapter(
     private val uris: MutableList<Uri>,
-    private val click:(position: Int) -> Unit,
-    private val longClick:(position: Int) -> Unit
+    private val click: (position: Int) -> Unit,
+    private val longClick: (position: Int) -> Unit
 ) : RecyclerView.Adapter<PagAdapter.PagHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PagHolder {
@@ -38,11 +38,11 @@ class PagAdapter(
 
     override fun getItemCount() = uris.size
 
-    fun setUri(index:Int, uri:Uri) {
+    fun setUri(index: Int, uri: Uri) {
         if (index < 0 || index >= uris.size) return
         uris[index] = uri
         notifyItemChanged(index)
-     }
+    }
 
 
     class PagHolder(private val binding: ItemPagBinding) : ViewHolder(binding.root) {

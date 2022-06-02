@@ -5,12 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.example.pagtest.databinding.ActivityCollageBinding
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class CollageActivity : AppCompatActivity() {
 
@@ -47,23 +50,19 @@ class CollageActivity : AppCompatActivity() {
 
 
         lifecycleScope.launch {
+
             val size = (24000 / uris.size).coerceIn(256, 1920)
-            val bitmaps = uris.map { getBitmapWithSize(it, size) }
+            val testBitmaps = uris.map { TestBitmap(it, getBitmapWithSize(it, size, size)) }
 
-            val testBitmaps = bitmaps.map {
-                TestBitmap(it)
-            }
-
-            (binding.collageView as TurboCollageView).setBitmaps(testBitmaps)
+            binding.collageView.setBitmaps(testBitmaps, lifecycleScope)
 
             binding.buttonRefresh.setOnClickListener {
-                (binding.collageView as TurboCollageView).collage()
+                animateCollage()
             }
 
-            binding.buttonType?.setOnClickListener {
-                (binding.collageView as TurboCollageView).changeType()
+            binding.buttonType.setOnClickListener {
+                changeType()
             }
-
 
             //16:9
             binding.button2.setOnClickListener {
@@ -86,8 +85,39 @@ class CollageActivity : AppCompatActivity() {
                 changRatio("9:16")
             }
 
-        }
+            binding.buttonSave.setOnClickListener {
+                lifecycleScope.launch {
+                    binding.progressBar2.visibility = View.VISIBLE
+                    val bitmap = binding.collageView.getHighResBitmap(2.0f)
+                    bitmap?.also {
+                        val result = saveBitmapToFile(it, UUID.randomUUID().toString())
+                        Toast.makeText(this@CollageActivity, "save: $result", Toast.LENGTH_SHORT).show()
+                    } ?: run {
+                        Toast.makeText(this@CollageActivity, "error: bitmap null", Toast.LENGTH_SHORT).show()
+                    }
+                    binding.progressBar2.visibility = View.GONE
+                }
+            }
 
+        }
+    }
+
+    private fun animateCollage() {
+        lifecycleScope.launch {
+            binding.collageView.animateCollage()
+        }
+    }
+
+    private fun changeType() {
+        lifecycleScope.launch {
+            binding.collageView.changeType()
+        }
+    }
+
+    private fun collage() {
+        lifecycleScope.launch {
+            binding.collageView.collage()
+        }
     }
 
     private fun changRatio(ratio: String) {
@@ -96,7 +126,7 @@ class CollageActivity : AppCompatActivity() {
         }
 
         binding.collageView.post {
-            (binding.collageView as TurboCollageView).collage()
+            collage()
         }
     }
 

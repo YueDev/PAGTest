@@ -18,7 +18,6 @@ public class TCShuffle {
     double ratio;
     TCJoin tcJoin;
 
-
     private double a(double d, double d2) {
         List<TCCollageItem> arrayList = new ArrayList<>(b());
         a(arrayList, new TCRect(0.0d, 0.0d, 1.0d, 1.0d));

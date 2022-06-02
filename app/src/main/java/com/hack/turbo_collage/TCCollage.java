@@ -44,13 +44,33 @@ public class TCCollage {
         }
     }
 
-    //拼图，并且返回结果
-    public TCResult collage(double width, double height, double padding) {
-        this.width = width;
-        this.height = height;
-        reCollage();
-        return drawCollage(padding);
+    //拼图，并且返回结果  回调版本 java用这个
+    public void collage(double width, double height, double padding, OnResultListener mListener) {
+        try {
+            this.width = width;
+            this.height = height;
+            reCollage();
+            TCResult result = drawCollage(padding);
+            mListener.onSuccess(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mListener.onError(e);
+        }
     }
+
+    //同步版本 kotlin协程用这个
+    public TCResult collage(double width, double height, double padding) {
+        try {
+            this.width = width;
+            this.height = height;
+            reCollage();
+            return drawCollage(padding);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
     private TCResult drawCollage(double frame) {
@@ -118,16 +138,16 @@ public class TCCollage {
 
     private int d() {
         int i;
-        if (this.collageItems.size() > 0) {
+        if (collageItems.size() > 0) {
             int i2 = 0;
             int i3 = 1;
-            double z = ((TCCollageItem) this.collageItems.get(0)).getRatioMaxBound(this.width, this.height);
+            double z = collageItems.get(0).getRatioMaxBound(this.width, this.height);
             while (true) {
                 i = i2;
-                if (i3 >= this.collageItems.size()) {
+                if (i3 >= collageItems.size()) {
                     break;
                 }
-                double a = ((TCCollageItem) this.collageItems.get(i3)).getRatioMaxBound(this.width, this.height);
+                double a = collageItems.get(i3).getRatioMaxBound(this.width, this.height);
                 double z2 = z;
                 if (a > z) {
                     z2 = a;
@@ -144,7 +164,7 @@ public class TCCollage {
 
     private TCRect a(int i) {
         TCRect tcRect;
-        TCCollageItem item = (TCCollageItem) this.collageItems.get(i);
+        TCCollageItem item = this.collageItems.get(i);
         double nextInt = 0.4d + (new Random().nextInt(20) / 100.0d);
         TCRect iVar = item.ratioRect;
         if (item.ratioRect.right * this.width < item.ratioRect.bottom * this.height) {
@@ -157,5 +177,10 @@ public class TCCollage {
         return tcRect;
     }
 
+
+    public interface OnResultListener {
+        void onSuccess(TCResult mResult);
+        void onError(Exception e);
+    }
 
 }

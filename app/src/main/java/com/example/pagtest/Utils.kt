@@ -2,6 +2,7 @@ package com.example.pagtest
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -9,6 +10,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.activity.result.ActivityResultLauncher
@@ -23,6 +26,7 @@ import com.sangcomz.fishbun.FishBun
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
 
 val emptyBitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
 
@@ -81,7 +85,7 @@ const val IMAGE_MAX_SIZE = 1920
 //rv的性能 glide好一些
 //单纯加载bitmap coil glide差不多，都很快，coil有原生协程，glide需要自己开作用域
 @JvmName("getBitmapFromUri1")
-suspend fun Activity.getBitmapFromUri(uri: Uri): Bitmap {
+suspend fun Context.getBitmapFromUri(uri: Uri): Bitmap {
     //Coil
     val request = ImageRequest.Builder(this)
         .data(uri)
@@ -97,13 +101,13 @@ suspend fun Activity.getBitmapFromUri(uri: Uri): Bitmap {
 }
 
 @JvmName("getBitmapWithSize1")
-suspend fun Activity.getBitmapWithSize(uri: Uri, max: Int): Bitmap {
+suspend fun Context.getBitmapWithSize(uri: Uri, sizeW: Int, sizeH: Int, isScaleFill: Boolean = false): Bitmap {
     //Coil
     val request = ImageRequest.Builder(this)
         .data(uri)
         .allowConversionToBitmap(true)
-        .size(max)
-        .scale(Scale.FIT)
+        .size(sizeW, sizeH)
+        .scale(Scale.FILL)
         .memoryCachePolicy(CachePolicy.DISABLED)
         .diskCachePolicy(CachePolicy.DISABLED)
         .allowHardware(false)
@@ -111,6 +115,7 @@ suspend fun Activity.getBitmapWithSize(uri: Uri, max: Int): Bitmap {
     val drawable = imageLoader.execute(request).drawable ?: throw Exception("drawable is null!")
     return (drawable as BitmapDrawable).bitmap
 }
+
 
 //根据uri获取文件名
 @JvmName("getFileNameFromUri1")
@@ -149,3 +154,31 @@ private val colors = listOf(
     Color.parseColor("#607d8b"),
     Color.parseColor("#651fff"),
 )
+
+suspend fun Context.saveBitmapToFile(bitmap: Bitmap, fileName: String) = withContext(Dispatchers.IO) {
+
+    val isUpQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+
+    val externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        put(MediaStore.Images.Media.TITLE, fileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.DESCRIPTION, fileName)
+        if (isUpQ) put(MediaStore.Images.Media.IS_PENDING, 1)
+    }
+
+    val insertUri = contentResolver.insert(externalUri, values)
+
+    insertUri ?: return@withContext false
+
+    return@withContext contentResolver.openOutputStream(insertUri).use {
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it).also { result ->
+            if (result && isUpQ) {
+                values.clear()
+                values.put(MediaStore.Images.Media.IS_PENDING, 0);
+                contentResolver.update(insertUri, values, null, null);
+            }
+        }
+    }
+}

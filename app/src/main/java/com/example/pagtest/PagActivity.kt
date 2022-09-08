@@ -10,6 +10,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -377,7 +378,23 @@ class PagActivity : AppCompatActivity() {
             finish()
             true
         }
+        100 -> {
+            uris.forEachIndexed { index, _ ->
+                pagFile.replaceImage(index, PAGImage.FromBitmap(null))
+            }
+            pagView.flush()
+            Toast.makeText(this, "已清楚所有图片", Toast.LENGTH_SHORT).show()
+            true
+        }
         else -> false
+
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menu?.add(0, 100, 0, "清除所有图片")
+        return true
     }
 
 

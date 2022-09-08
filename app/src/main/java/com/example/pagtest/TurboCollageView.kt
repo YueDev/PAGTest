@@ -1,20 +1,11 @@
 package com.example.pagtest
 
 import android.animation.ObjectAnimator
-import android.animation.TimeAnimator
-import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import androidx.annotation.MainThread
 import androidx.annotation.UiThread
 import com.hack.turbo_collage.TCBitmap
 import com.hack.turbo_collage.TCCollage
@@ -22,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.log
 
 
 /**
@@ -53,7 +43,7 @@ class TurboCollageView : View {
 
     private val animator = ObjectAnimator.ofFloat(0f, 100f).apply {
 
-        duration = 2500
+        duration = 1000
         addUpdateListener { ani ->
             val progress = ani.animatedFraction
             bitmaps.forEach {
@@ -131,7 +121,7 @@ class TurboCollageView : View {
         collage()
     }
 
-    private fun centerCrop(bitmap: Bitmap, rect: RectF, matrix:Matrix)  {
+    private fun centerCrop(bitmap: Bitmap, rect: RectF, matrix: Matrix) {
 
         val scale = (rect.width() / bitmap.width).coerceAtLeast(rect.height() / bitmap.height)
         val dx = rect.centerX() - bitmap.width / 2f
@@ -142,7 +132,7 @@ class TurboCollageView : View {
         matrix.postScale(scale, scale, rect.centerX(), rect.centerY())
     }
 
-    private fun fitCenter(bitmap: Bitmap, rect: RectF, matrix:Matrix) {
+    private fun fitCenter(bitmap: Bitmap, rect: RectF, matrix: Matrix) {
 
         val scale = (rect.width() / bitmap.width).coerceAtMost(rect.height() / bitmap.height)
         val dx = rect.centerX() - bitmap.width / 2f

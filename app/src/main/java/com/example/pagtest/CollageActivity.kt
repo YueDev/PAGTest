@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -13,7 +14,8 @@ import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.example.pagtest.databinding.ActivityCollageBinding
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.util.*
+import kotlin.math.sqrt
 
 class CollageActivity : AppCompatActivity() {
 
@@ -51,7 +53,10 @@ class CollageActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
 
-            val size = (24000 / uris.size).coerceIn(256, 1920)
+            val size = sqrt(2048.0 * 2048.0 / uris.size).toInt().coerceAtMost(1920)
+
+            Log.d("YUEDEVTAG", "size:$size")
+
             val testBitmaps = uris.map { TestBitmap(it, getBitmapWithSize(it, size, size)) }
 
             binding.collageView.setBitmaps(testBitmaps, lifecycleScope)

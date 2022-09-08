@@ -27,9 +27,6 @@ import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-
-val emptyBitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888)
-
 fun toGallery(activity: Activity, selectNum: Int, activityResultLauncher: ActivityResultLauncher<Intent>) {
     FishBun
         .with(activity)
@@ -176,8 +173,8 @@ suspend fun Context.saveBitmapToFile(bitmap: Bitmap, fileName: String) = withCon
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it).also { result ->
             if (result && isUpQ) {
                 values.clear()
-                values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                contentResolver.update(insertUri, values, null, null);
+                values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(insertUri, values, null, null)
             }
         }
     }

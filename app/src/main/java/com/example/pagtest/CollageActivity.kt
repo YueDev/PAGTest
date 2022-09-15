@@ -98,7 +98,7 @@ class CollageActivity : AppCompatActivity() {
                         val result = saveBitmapToFile(it, UUID.randomUUID().toString())
                         Toast.makeText(this@CollageActivity, "save: $result", Toast.LENGTH_SHORT).show()
                     } ?: run {
-                        Toast.makeText(this@CollageActivity, "error: bitmap null", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this@CollageActivity, "error: bitmap null", Toast.LENGTH_SHORT).show()
                     }
                     binding.progressBar2.visibility = View.GONE
                 }

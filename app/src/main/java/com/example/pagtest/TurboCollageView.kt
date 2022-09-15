@@ -171,6 +171,7 @@ class TurboCollageView : View {
     @UiThread
     suspend fun getHighResBitmap(scale: Float) = withContext(Dispatchers.Default) {
         if (measuredWidth == 0 || measuredHeight == 0) return@withContext null
+        if (animator.isStarted) return@withContext null
         val result = Bitmap.createBitmap((measuredWidth * scale).toInt(), (measuredHeight * scale).toInt(), Bitmap.Config.RGB_565)
 
         val canvas = Canvas(result)

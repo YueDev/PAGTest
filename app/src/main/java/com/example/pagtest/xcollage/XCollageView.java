@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -25,7 +26,6 @@ import java.util.List;
  */
 public class XCollageView extends View {
 
-
     private final TCCollage mCollage = new TCCollage();
 
     private final CollageType mCollageType = CollageType.CENTER_CROP;
@@ -34,6 +34,8 @@ public class XCollageView extends View {
     private final Paint mBitmapPaint = new Paint();
 
     private boolean mCanDraw = false;
+
+    private boolean mCanCollage = true;
 
     public XCollageView(Context context) {
         super(context);
@@ -69,6 +71,7 @@ public class XCollageView extends View {
                     xBitmap.getRect().bottom
             );
             canvas.drawBitmap(xBitmap.getBitmap(), xBitmap.getMatrix(), mBitmapPaint);
+            canvas.restore();
         }
     }
 
@@ -86,12 +89,15 @@ public class XCollageView extends View {
 
             mCollage.init(tcBitmaps);
             mCanDraw = true;
+            collage();
         });
     }
 
 
     //拼图 无动画
     public void collage() {
+        if (!mCanCollage) return;
+        mCanCollage = false;
         new Thread(() -> {
             TCResult result = mCollage.collage(getMeasuredWidth(), getMeasuredHeight(), 0.0);
             if (result != null) {
@@ -115,6 +121,7 @@ public class XCollageView extends View {
                 }
                 postInvalidate();
             }
+            mCanCollage = true;
         }).start();
     }
 

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pagtest.databinding.ActivityMainBinding
+import com.example.pagtest.xcollage.XCollageActivity
 import com.permissionx.guolindev.PermissionX
 import com.sangcomz.fishbun.FishBun
 
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val collageGalleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
             val uris = it.data?.getParcelableArrayListExtra<Uri>(FishBun.INTENT_PATH) ?: return@registerForActivityResult
-            CollageActivity.startNewInstance(this, uris)
+            XCollageActivity.startNewInstance(this, uris)
         }
     }
 

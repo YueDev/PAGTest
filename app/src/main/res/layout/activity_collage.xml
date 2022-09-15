@@ -18,27 +18,7 @@
         android:text="Refresh"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buttonType"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/buttonType"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:drawableStart="@drawable/ic_refresh"
-        android:drawablePadding="16dp"
-        android:padding="16dp"
-        android:text="Type"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSave"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/buttonRefresh"
-        app:layout_constraintTop_toTopOf="@+id/buttonRefresh"
-        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/buttonSave"
@@ -53,11 +33,9 @@
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="@+id/buttonRefresh"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/buttonType"
         app:layout_constraintTop_toTopOf="@+id/buttonRefresh" />
 
-    <com.example.pagtest.TurboCollageView
+    <com.example.pagtest.xcollage.XCollageView
         android:id="@+id/collageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -132,11 +110,66 @@
         android:layout_marginBottom="16dp"
         android:text="9:16"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/buttonRefresh"
+        app:layout_constraintBottom_toTopOf="@+id/buttonNone"
         app:layout_constraintEnd_toStartOf="@+id/button4"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonNone"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="无边框"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRefresh"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSmall"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/buttonBig"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="大"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonMedium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonMedium"
+        app:layout_constraintTop_toTopOf="@+id/buttonMedium" />
+
+    <Button
+        android:id="@+id/buttonSmall"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="小"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonNone"
+        app:layout_constraintEnd_toStartOf="@+id/buttonMedium"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonNone"
+        app:layout_constraintTop_toTopOf="@+id/buttonNone" />
+
+    <Button
+        android:id="@+id/buttonMedium"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="中"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonSmall"
+        app:layout_constraintEnd_toStartOf="@+id/buttonBig"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/buttonSmall"
+        app:layout_constraintTop_toTopOf="@+id/buttonSmall" />
 
     <ProgressBar
         android:id="@+id/progressBar2"
@@ -145,7 +178,7 @@
         android:layout_height="0dp"
         android:background="#BB000000"
         android:clickable="true"
-        android:contentDescription="Saving"
+        android:contentDescription="wait a moment"
         android:focusable="true"
         android:padding="160dp"
         android:visibility="gone"
@@ -153,6 +186,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

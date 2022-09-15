@@ -176,8 +176,8 @@ suspend fun Context.saveBitmapToFile(bitmap: Bitmap, fileName: String) = withCon
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, it).also { result ->
             if (result && isUpQ) {
                 values.clear()
-                values.put(MediaStore.Images.Media.IS_PENDING, 0);
-                contentResolver.update(insertUri, values, null, null);
+                values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(insertUri, values, null, null)
             }
         }
     }

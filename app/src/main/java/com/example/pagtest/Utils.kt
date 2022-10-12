@@ -43,21 +43,8 @@ fun toGallery(activity: Activity, selectNum: Int, activityResultLauncher: Activi
         .startAlbumWithActivityResultCallback(activityResultLauncher)
 }
 
-fun toGallery(fragment: Fragment, selectNum: Int, activityResultLauncher: ActivityResultLauncher<Intent>) {
-    FishBun
-        .with(fragment)
-        .setImageAdapter(GlideAdapter())
-        .setMaxCount(selectNum)
-        .setActionBarColor(
-            ResourcesCompat.getColor(fragment.resources, R.color.colorPrimary, null),
-            ResourcesCompat.getColor(fragment.resources, R.color.colorPrimaryDark, null)
-        )
-        .startAlbumWithActivityResultCallback(activityResultLauncher)
-}
-
-
 //rv的性能 glide好一些
-//单纯加载bitmap coil glide差不多，都很快，coil有原生协程，glide需要自己开作用域
+//单纯加载bitmap coil glide差不多，都很快，coil有原生协程
 suspend fun getBitmapFromUri(context: Context, uri: Uri): Bitmap {
     //Coil
     val request = ImageRequest.Builder(context)
@@ -79,11 +66,10 @@ fun dp2px(dpValue: Float): Int {
     return (dpValue * scale + 0.5f).toInt()
 }
 
-
 const val IMAGE_MAX_SIZE = 1920
 
-//rv的性能 glide好一些
-//单纯加载bitmap coil glide差不多，都很快，coil有原生协程，glide需要自己开作用域
+
+
 @JvmName("getBitmapFromUri1")
 suspend fun Context.getBitmapFromUri(uri: Uri): Bitmap {
     //Coil
@@ -138,23 +124,8 @@ suspend fun Context.getFileNameFromUri(uri: Uri): String = withContext(Dispatche
 fun Context.getDefaultName(uri: Uri) =
     "${System.currentTimeMillis()}.${MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri))}"
 
-private val colors = listOf(
-    Color.parseColor("#f8bbd0"),
-    Color.parseColor("#f06292"),
-    Color.parseColor("#d81b60"),
-    Color.parseColor("#9575cd"),
-    Color.parseColor("#512da8"),
-    Color.parseColor("#64b5f6"),
-    Color.parseColor("#0097a7"),
-    Color.parseColor("#006064"),
-    Color.parseColor("#cddc39"),
-    Color.parseColor("#f9a825"),
-    Color.parseColor("#d84315"),
-    Color.parseColor("#9e9e9e"),
-    Color.parseColor("#607d8b"),
-    Color.parseColor("#651fff"),
-)
 
+//保存bitmap到文件
 suspend fun Context.saveBitmapToFile(bitmap: Bitmap, fileName: String) = withContext(Dispatchers.IO) {
 
     val isUpQ = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q

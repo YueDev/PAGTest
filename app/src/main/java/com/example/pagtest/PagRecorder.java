@@ -26,8 +26,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
+//一个很古老的的mediacodec编码，用在生产环境请优化下代码
 public class PagRecorder {
 
+    //保存状态的回调
     public interface Listener {
         void onSuccess();
 
@@ -41,7 +43,7 @@ public class PagRecorder {
     //视频进度占总进度的百分比
     private static final float VIDEO_PROGRESS_PERCENT = 95f;
 
-    private static final String TAG = "YUEDEVTAG";
+    private static final String TAG = "PAG_TEST_TAG";
 
     private static final boolean DEBUG = BuildConfig.DEBUG;
 
@@ -83,7 +85,7 @@ public class PagRecorder {
 
     //PAG相关
     private PAGPlayer mPagPlayer;
-    private PAGFile mPagFile;
+    private final PAGFile mPagFile;
 
     private boolean mIsForceStop = false;
 
@@ -102,12 +104,12 @@ public class PagRecorder {
         mVideoBitRate = mVideoWidth * mVideoHeight * 8 * mFrameRate / 30;
 
         if (DEBUG) {
-            Log.d("YUEDEVTAG", "mFrameRate: " + mFrameRate);
-            Log.d("YUEDEVTAG", "mVideoTime: " + mVideoTime);
-            Log.d("YUEDEVTAG", "mFrameNum: " + mFrameNum);
-            Log.d("YUEDEVTAG", "mVideoWidth: " + mVideoWidth);
-            Log.d("YUEDEVTAG", "mVideoHeight: " + mVideoHeight);
-            Log.d("YUEDEVTAG", "mVideoBitRate: " + mVideoBitRate);
+            Log.d(TAG, "mFrameRate: " + mFrameRate);
+            Log.d(TAG, "mVideoTime: " + mVideoTime);
+            Log.d(TAG, "mFrameNum: " + mFrameNum);
+            Log.d(TAG, "mVideoWidth: " + mVideoWidth);
+            Log.d(TAG, "mVideoHeight: " + mVideoHeight);
+            Log.d(TAG, "mVideoBitRate: " + mVideoBitRate);
         }
 
 
@@ -131,13 +133,14 @@ public class PagRecorder {
 
         mListener = listener;
         try {
-            // 初始化视频
+            //初始化视频
             initVideo(outPath, outFD, mVideoWidth, mVideoHeight);
             //初始化音频
             initAudio(musicPath, musicAFD, musicUri, musicUriContext);
 
             mPagFrameChanged = new boolean[mFrameNum];
 
+            //视频编码
             for (int i = 0; i < mFrameNum; i++) {
                 drawPAG(i);
                 drainEncoder(false);
@@ -147,15 +150,16 @@ public class PagRecorder {
                     mListener.onProgress(progress);
                 }
             }
-
-            // 停止视频解码
+            //视频编码结束
             drainEncoder(true);
 
+            //音频编码
             if (hasAudio()) {
                 while (mAudioStarted) {
                     stepPipeline();
                 }
             }
+            //释放编码器
             releaseEncoder();
             if (mListener != null) {
                 mListener.onProgress(100f);
@@ -164,7 +168,7 @@ public class PagRecorder {
         } catch (Exception e) {
             e.printStackTrace();
             //记录下record error
-            if (DEBUG) Log.d("YUEDEVTAG", "record error: " + e.getMessage());
+            if (DEBUG) Log.d(TAG, "record error: " + e.getMessage());
             releaseEncoder();
             if (mListener != null) mListener.onError(e);
         }
@@ -172,6 +176,9 @@ public class PagRecorder {
 
 //    private long mPagPts = 0L;
 
+    //用来记录pag画面是否发生改变
+    //逐帧编码的时候，pag如果不发生改变 则需要跳过这一帧的编码，直到pag发生改变
+    //这样才能使编码器的帧数和pag的帧数对应起来，pts不会错
     private boolean[] mPagFrameChanged;
 
     //pag毫秒绘制
@@ -281,7 +288,7 @@ public class PagRecorder {
             //拿到输出缓冲区的索引
             int encoderStatus = mVideoEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
 
-            if (DEBUG) Log.d("YUEDEVTAG", "encoderStatus:" + encoderStatus);
+            if (DEBUG) Log.d(TAG, "encoderStatus:" + encoderStatus);
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 // no output available yet
                 if (!endOfStream) {
@@ -324,7 +331,7 @@ public class PagRecorder {
                     String message = "mBufferInfo.size: " + mBufferInfo.size + ", " +
                             "mBufferInfo.offset: " + mBufferInfo.offset + ", " +
                             "capacity: " + encodedData.capacity();
-                    if (DEBUG) Log.d("YUEDEVTAG", "record message: " + message);
+                    if (DEBUG) Log.d(TAG, "record message: " + message);
                 }
 
                 if (mBufferInfo.size != 0) {
@@ -346,12 +353,13 @@ public class PagRecorder {
 
                     mPTSCount++;
 
-                    if (DEBUG) Log.d("YUEDEVTAG", "count: " + mPTSCount + ", pts: " + pts);
+                    if (DEBUG) Log.d(TAG, "count: " + mPTSCount + ", pts: " + pts);
                     // 往容器写入数据
                     mMuxer.writeSampleData(mVideoTrackIndex, encodedData, mBufferInfo);
                     if (DEBUG) Log.d(TAG, "sent " + mBufferInfo.size + " bytes to muxer");
                 }
-                //释放资源
+
+                //释放Buffer
                 mVideoEncoder.releaseOutputBuffer(encoderStatus, false);
 
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -370,6 +378,7 @@ public class PagRecorder {
     /**
      * Releases encoder resources.  May be called after partial / failed initialization.
      * 释放资源
+     * 经常会发生释放崩溃，必须try
      */
     public void releaseEncoder() {
         try {
@@ -425,13 +434,13 @@ public class PagRecorder {
 
             if (musicPath != null) {
                 mAudioExtractor.setDataSource(musicPath);
-                if (DEBUG) Log.d("YUEDEVTAG", "musicPath:" + musicPath);
+                if (DEBUG) Log.d(TAG, "musicPath:" + musicPath);
             } else if (musicAFD != null) {
                 mAudioExtractor.setDataSource(musicAFD.getFileDescriptor(), musicAFD.getStartOffset(), musicAFD.getLength());
-                if (DEBUG) Log.d("YUEDEVTAG", "musicAFD:" + musicAFD);
+                if (DEBUG) Log.d(TAG, "musicAFD:" + musicAFD);
             } else if (musicUri != null && musicUriContext != null) {
                 mAudioExtractor.setDataSource(musicUriContext, musicUri, null);
-                if (DEBUG) Log.d("YUEDEVTAG", "musicUri:" + musicUri);
+                if (DEBUG) Log.d(TAG, "musicUri:" + musicUri);
             } else {
                 //path afd uri都是空，不进行音乐编码
                 mAudioStarted = false;
@@ -470,7 +479,7 @@ public class PagRecorder {
         try {
             int trackIndex = mAudioExtractor.getSampleTrackIndex();
             //没有通道
-            if (DEBUG) Log.d("YUEDEVTAG", "hasAudio: " + (trackIndex >= 0));
+            if (DEBUG) Log.d(TAG, "hasAudio: " + (trackIndex >= 0));
             return trackIndex >= 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -489,11 +498,11 @@ public class PagRecorder {
         int chunkSize = mAudioExtractor.readSampleData(mAudioBuff, 0);
         long sampleTime = mAudioExtractor.getSampleTime();//返回当前的时间戳 微秒
 
-        if (DEBUG) Log.d("YUEDEVTAG", "audio sampleTime: " + sampleTime);
+        if (DEBUG) Log.d(TAG, "audio sampleTime: " + sampleTime);
 
         //结束
         if (sampleTime > mVideoTime) {
-            if (DEBUG) Log.d("YUEDEVTAG", "mux audio end");
+            if (DEBUG) Log.d(TAG, "mux audio end");
             mAudioBuff.clear();
             mAudioBuffInfo.set(0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             mMuxer.writeSampleData(mAudioTrackIndex, mAudioBuff, mAudioBuffInfo);
@@ -512,7 +521,7 @@ public class PagRecorder {
             }
         } else {
             //无数据了
-            if (DEBUG) Log.d("YUEDEVTAG", "no audio data");
+            if (DEBUG) Log.d(TAG, "no audio data");
             mAudioBuff.clear();
             mAudioBuffInfo.set(0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             mMuxer.writeSampleData(mAudioTrackIndex, mAudioBuff, mAudioBuffInfo);
@@ -521,6 +530,8 @@ public class PagRecorder {
 
     }
 
+
+    //=============================低版本保存后更新媒体库======================================
 
     /**
      * copy from EditorBaseActivity

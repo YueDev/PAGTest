@@ -10,7 +10,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-
 public class PagSeekBar extends View {
     //==========================自定义区域===========================
 

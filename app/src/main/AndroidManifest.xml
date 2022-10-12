@@ -17,9 +17,7 @@
         android:theme="@style/Theme.PAGTest"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".CollageActivity"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -29,12 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".PagActivity"
             android:exported="false" />
+
         <activity
             android:name=".SaveActivity"
             android:exported="false" />
+
     </application>
 
 </manifest>

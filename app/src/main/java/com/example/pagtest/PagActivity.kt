@@ -3,13 +3,11 @@ package com.example.pagtest
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -66,6 +64,7 @@ class PagActivity : AppCompatActivity() {
     //换图
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
+            //新方法要求api33
             val uris = it.data?.getParcelableArrayListExtra<Uri>(FishBun.INTENT_PATH) ?: return@registerForActivityResult
             changePicture(selectIndex, uris[0])
         }
@@ -134,19 +133,19 @@ class PagActivity : AppCompatActivity() {
         processBar.visibility = View.VISIBLE
 
 
-        //pag
+        //pag flush监听 主要是更新进度条
         pagView.addPAGFlushListener {
             if (!pagView.isPlaying) return@addPAGFlushListener
             val time = pagView.progress * seekBar.max
             seekBar.value = time.toLong()
         }
 
+        //pag的播放监听
         pagView.addListener(object : PAGViewListener {
             override fun onAnimationStart(view: PAGView) {}
             override fun onAnimationEnd(view: PAGView) {
                 if (pagView.progress == 1.0) {
-                    Log.d("YUEDEVTAG", "onAnimationEnd: 111111")
-                    //判断动画结束，pag会自动停止，更新部分ui
+                    //判断动画结束，pag会自动停止，更新ui
                     setPlay(false)
                     seekBar.value = seekBar.max
                     changeMusicProgress(0)
@@ -163,7 +162,7 @@ class PagActivity : AppCompatActivity() {
         seekBar.max = duration
         seekBar.value = 0L
 
-
+        //seekbar 与pag的
         seekBar.setOnSeekBarTouchListener(object : PagSeekBar.OnTouchListener {
             override fun onStartTouch(value: Long) {
                 if (!canDrop) return
@@ -236,7 +235,6 @@ class PagActivity : AppCompatActivity() {
 
 
     private fun changeMusicProgress(time: Long) {
-        Log.d("YUEDEVTAG", "changeMusicProgress: ${time / 1000}")
         mediaPlayer?.seekTo((time / 1000).toInt())
     }
 
@@ -294,6 +292,7 @@ class PagActivity : AppCompatActivity() {
             for (i in uriList.indices) {
                 pagFile.replaceImage(i, PAGImage.FromBitmap(getBitmapFromUri(uriList[i])))
             }
+
             pagView.composition = pagFile
             pagView.flush()
             processBar.visibility = View.GONE
@@ -308,6 +307,7 @@ class PagActivity : AppCompatActivity() {
         toGallery(this, 1, galleryLauncher)
     }
 
+
     //换图 去裁切
     private fun changePicture(index: Int, uri: Uri) {
         adapter.setUri(index, uri)
@@ -316,6 +316,7 @@ class PagActivity : AppCompatActivity() {
                 setGuidelines(CropImageView.Guidelines.ON)
             })
     }
+
 
     //裁切
     private fun cropPicture(index: Int, uri: Uri) {
@@ -379,11 +380,12 @@ class PagActivity : AppCompatActivity() {
             true
         }
         100 -> {
+            //清除所有图片
             uris.forEachIndexed { index, _ ->
                 pagFile.replaceImage(index, PAGImage.FromBitmap(null))
             }
             pagView.flush()
-            Toast.makeText(this, "已清楚所有图片", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "已清除所有图片", Toast.LENGTH_SHORT).show()
             true
         }
         else -> false
@@ -401,7 +403,7 @@ class PagActivity : AppCompatActivity() {
 }
 
 
-//状态管理
+//状态管理 比较简单 没有用ViewModel
 class StateManager {
 
     private val _playState = MutableLiveData(false)
